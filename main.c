@@ -1,8 +1,8 @@
 #include <stdio.h>
+#include "chess_engine.h"
 
 int main()
 {
-    int a = 0;
-    printf("value: %u \n", a);
-    return 0;
+    engine_init_board();
+    while(1);
 }

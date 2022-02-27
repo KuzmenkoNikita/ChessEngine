@@ -1,14 +1,17 @@
 #include <stdint.h>
+#include "chess_engine.h"
 
 /** @brief game cell is 8 bit unsigned integer:
- * bits 0-3 - figure type
- * bit 4 - moving flag
- * bit 5 - black figure flag
- * bit 6 - white figure flag
+ * bits 0-2 - figure type
+ * bit 3 - moving flag
+ * bit 4 - black figure flag
+ * bit 5 - white figure flag
+ * bit 6 - Board border
+ * bits 7-10 - index in figures array
 */
-typedef uint8_t game_cell;   
+typedef uint32_t game_cell;   
 
-#define GAME_DESK_LINE_SIZE 8
+#define GAME_BOARD_LINE_SIZE 8
 #define PLAYER_MAX_FIGURES_COUNT    16
 
 /** @brief pieces types*/
@@ -24,12 +27,18 @@ typedef uint8_t game_cell;
 #define FIGURE_TYPE_MASK    0x07
 #define FIGURE_MOVE_MASK    0x08
 #define FIGURE_BLACK_MASK   0x10
-#define FIGURE_WHITE_MASK   0x10
+#define FIGURE_WHITE_MASK   0x20
+#define FIGURE_BORDER_MASK  0x40
+#define FIGURE_INDEX_MASK   0x780
 /* ********************************* */
-#define FIGURE_COLOR(f)     ((f) & (FIGURE_BLACK_MASK | FIGURE_WHITE_MASK))
-#define FIGURE_TYPE(f)      ((f) & FIGURE_TYPE_MASK)
-#define IS_FIGURE_MOVED(f)  ((f) & FIGURE_MOVE_MASK)
-#define OUT_BOARD(x,y)      ((unsigned)(x) >= GAME_DESK_LINE_SIZE || (unsigned)(y) >= GAME_DESK_LINE_SIZE)
+#define FIGURE_COLOR(f)         ((f) & (FIGURE_BLACK_MASK | FIGURE_WHITE_MASK))
+#define FIGURE_TYPE(f)          ((f) & FIGURE_TYPE_MASK)
+#define IS_FIGURE_MOVED(f)      ((f) & FIGURE_MOVE_MASK)
+#define OUT_BOARD(f)            ((f) & FIGURE_BORDER_MASK)
+#define Z_TO_X(z)               (((z) & 15) - 4)
+#define Z_TO_Y(z)               (((z) >> 4) - 4)
+#define FIGURE_INDEX(f)         (((f) & FIGURE_INDEX_MASK) >> 7)
+#define FIGURE_SET_INDEX(f,i)   ((f) | ((i) << 7))
 /* ********************************* */
 /** @brief  pieces weight */
 #define FIGURE_W_PAWN       1000
@@ -47,62 +56,77 @@ static unsigned int m_fig_weigh[FIGURES_TYPES_COUNT+1] = {0, FIGURE_TYPE_KING, F
                                                             FIGURE_TYPE_ROOK, FIGURE_TYPE_BISHOP,
                                                             FIGURE_TYPE_KNIGHT, FIGURE_TYPE_PAWN};
 /* ********************************* */
-/** @brief  game desk array */                                                           
-game_cell m_game_desk[] = 
+/** @brief  game board array */ 
+#define GAME_BOARD_ARR_SIZE      GAME_BOARD_LINE_SIZE * GAME_BOARD_LINE_SIZE * 2 * 2                                                     
+game_cell m_game_board[GAME_BOARD_ARR_SIZE];
+
+const static uint8_t m_xy_to_z[GAME_BOARD_LINE_SIZE][GAME_BOARD_LINE_SIZE] = 
 {
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
-
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-    255, 255, 255, 255,      0,   0,   0,   0,  0,   0,   0,   0,       255, 255, 255, 255,
-
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
-    255, 255, 255, 255,     255, 255, 255, 255,255, 255, 255, 255,      255, 255, 255, 255,
+    {68, 84, 100, 116, 132, 148, 164, 180},
+    {69, 85, 101, 117, 133, 149, 165, 181},
+    {70, 86, 102, 118, 134, 150, 166, 182},
+    {71, 87, 103, 119, 135, 151, 167, 183},
+    {72, 88, 104, 120, 136, 152, 168, 184},
+    {73, 89, 105, 121, 137, 153, 169, 185},
+    {74, 90, 106, 122, 138, 154, 170, 186},
+    {75, 91, 107, 123, 139, 155, 171, 187}
 };
 
 /* ********************************* */
-/** @brief  struct contains information about figure */  
-typedef struct figure_info_
+/** @brief  arrays with figures coordinates*/ 
+uint8_t m_w_fig_coords[PLAYER_MAX_FIGURES_COUNT];
+uint8_t m_b_fig_coords[PLAYER_MAX_FIGURES_COUNT];
+
+void engine_init_board(void)
 {
-    uint8_t figure_code;    
-    uint8_t x; 
-    uint8_t y;
-    struct figure_info_* p_next_fig; /* Pointer to next figure */
-}figure_info;
+    for(uint32_t i = 0; i < GAME_BOARD_ARR_SIZE; ++i)
+    {
+        m_game_board[i] = 0;
+        if((Z_TO_X(i) > GAME_BOARD_LINE_SIZE - 1) || (Z_TO_Y(i) >  GAME_BOARD_LINE_SIZE - 1))
+            m_game_board[i] |= FIGURE_BORDER_MASK;
+    }
 
-/* ********************************* */
-/** @brief  white and black figures info */     
-figure_info m_w_figs_info[PLAYER_MAX_FIGURES_COUNT];
-figure_info m_b_figs_info[PLAYER_MAX_FIGURES_COUNT];
 
-/* ********************************* */
-/** @brief figure move descriptor */ 
-typedef struct 
-{
-    uint8_t figure_code;
-    uint8_t x1;
-    uint8_t x2;
-    uint8_t y1;
-    uint8_t y2;
-}move_desc;
+    for(uint32_t i = 0; i < PLAYER_MAX_FIGURES_COUNT; ++i)
+    {
+        if(i + 1 == FIGURE_TYPE_KING)
+        {
+            m_w_fig_coords[i] = m_xy_to_z[4][0];
+            m_b_fig_coords[i] = m_xy_to_z[4][7];
 
-uint32_t engine_make_move(void)
-{
+            
+        }
 
+        for(uint8_t j = 0; j < GAME_BOARD_LINE_SIZE; ++j)
+        {
+            m_w_fig_coords[i]
+        }
+    }
+
+    
+
+    while(1);
 }
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 void chess_engine_init(void)
 {
     for(uint8_t n = FIGURE_TYPE_PAWN; n >= FIGURE_TYPE_KING; n--)
@@ -115,4 +139,4 @@ void chess_engine_init(void)
             }
         }
     }
-}
+}*/
