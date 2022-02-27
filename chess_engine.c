@@ -94,6 +94,7 @@ void engine_init_board(void)
             m_w_fig_coords[i] = m_xy_to_z[4][0];
             m_b_fig_coords[i] = m_xy_to_z[4][7];
 
+            m_game_board[m_w_fig_coords[i]] =| FIGURE_WHITE_MASK;
             
         }
 
