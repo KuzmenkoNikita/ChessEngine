@@ -58,7 +58,7 @@ static unsigned int m_fig_weigh[FIGURES_TYPES_COUNT+1] = {0, FIGURE_TYPE_KING, F
 /* ********************************* */
 /** @brief  game board array */ 
 #define GAME_BOARD_ARR_SIZE      GAME_BOARD_LINE_SIZE * GAME_BOARD_LINE_SIZE * 2 * 2                                                     
-game_cell m_game_board[GAME_BOARD_ARR_SIZE];
+static game_cell m_game_board[GAME_BOARD_ARR_SIZE];
 
 const static uint8_t m_xy_to_z[GAME_BOARD_LINE_SIZE][GAME_BOARD_LINE_SIZE] = 
 {
@@ -74,8 +74,15 @@ const static uint8_t m_xy_to_z[GAME_BOARD_LINE_SIZE][GAME_BOARD_LINE_SIZE] =
 
 /* ********************************* */
 /** @brief  arrays with figures coordinates*/ 
-uint8_t m_w_fig_coords[PLAYER_MAX_FIGURES_COUNT];
-uint8_t m_b_fig_coords[PLAYER_MAX_FIGURES_COUNT];
+static uint8_t m_w_fig_coords[PLAYER_MAX_FIGURES_COUNT];
+static uint8_t m_b_fig_coords[PLAYER_MAX_FIGURES_COUNT];
+
+
+static void engine_init_w_figure(uint8_t figure_type, uint8_t figure_index)
+{
+    
+}
+
 
 void engine_init_board(void)
 {
@@ -94,8 +101,11 @@ void engine_init_board(void)
             m_w_fig_coords[i] = m_xy_to_z[4][0];
             m_b_fig_coords[i] = m_xy_to_z[4][7];
 
-            m_game_board[m_w_fig_coords[i]] =| FIGURE_WHITE_MASK;
-            
+            m_game_board[m_w_fig_coords[i]] |= FIGURE_WHITE_MASK;
+            m_game_board[m_b_fig_coords[i]] |= FIGURE_BLACK_MASK;
+
+            FIGURE_SET_INDEX(m_game_board[m_w_fig_coords[i]], i);
+            FIGURE_SET_INDEX(m_game_board[m_b_fig_coords[i]], i);
         }
 
         for(uint8_t j = 0; j < GAME_BOARD_LINE_SIZE; ++j)
