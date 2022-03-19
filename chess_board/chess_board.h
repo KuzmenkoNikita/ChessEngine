@@ -146,5 +146,10 @@ bool board_get_move_flag(uint16_t z, bool* p_moved_flag);
  */
 bool board_check_border(uint16_t z);
 
+/**
+ * @brief game board init
+ */
+void board_init(void);
+
 
 #endif /* __CHESS_BOARD__ */
