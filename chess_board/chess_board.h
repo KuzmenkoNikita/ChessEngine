@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "chess_pieces.h"
 
 /** 
  * @brief game board information
@@ -48,28 +49,6 @@
  *  X X X X      X X X X X X X X     X X X X
  * 
  * */
-
-/* ********************************* */
-/** @brief pieces types */
-typedef enum
-{
-    FIGURE_TYPE_UNDEFINED,
-    FIGURE_TYPE_KING,     
-    FIGURE_TYPE_QUEEN,   
-    FIGURE_TYPE_ROOK,    
-    FIGURE_TYPE_BISHOP,  
-    FIGURE_TYPE_KNIGHT,  
-    FIGURE_TYPE_PAWN,    
-}chess_fig_type;
-
-/* ********************************* */
-/** @brief figure colors */
-typedef enum
-{
-    FIGURE_COLOR_UNDEFINED,
-    FIGURE_COLOR_BLACK,
-    FIGURE_COLOR_WHITE
-}chess_fig_color;
 
 /**
  * @brief translate x,y coordinates to one dimension
@@ -145,11 +124,6 @@ bool board_get_move_flag(uint16_t z, bool* p_moved_flag);
  *          is out of board
  */
 bool board_check_border(uint16_t z);
-
-/**
- * @brief game board init
- */
-void board_init(void);
 
 
 #endif /* __CHESS_BOARD__ */

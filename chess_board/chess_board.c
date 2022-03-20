@@ -132,7 +132,7 @@ bool board_translate_z_to_xy(uint16_t z, uint8_t* p_x, uint8_t* p_y)
     int8_t x = (z & 15) - 4;
     int8_t y = (z >> 4) - 4;
 
-    if(x < 0 || y < 0 || x > 7 || y > 7)
+    if(x < 0 || y < 0 || x > GAME_BOARD_LINE_SIZE - 1 || y > GAME_BOARD_LINE_SIZE - 1)
         return false;
 
     *p_x = x;
@@ -251,13 +251,4 @@ bool board_check_border(uint16_t z)
 
     return true;
 }
-/* **************************************************************** */
-void board_init(void)
-{
-    for(uint32_t i = 0; i < GAME_BOARD_ARR_SIZE; ++i)
-    {
 
-    }
-
-    return;
-}
