@@ -5,8 +5,8 @@
 
 int main()
 {
-    uint8_t x = 0;
-    uint8_t y = 0;
+    uint8_t x = 3;
+    uint8_t y = 6;
 
     uint16_t z = 0;
 
@@ -14,9 +14,9 @@ int main()
 
     bool in_border = board_check_border(z);
 
-    uint16_t* p_coords = 0;
-    uint16_t moves = 0;
-    pieces_get_moves_coords(z, p_coords, &moves);
+    //uint16_t* p_coords = 0;
+    //uint16_t moves = 0;
+    //pieces_get_moves_coords(z, p_coords, &moves);
 
 
     while(1);
