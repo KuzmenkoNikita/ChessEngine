@@ -21,7 +21,14 @@ ChessWidget::ChessWidget(QWidget *parent) : QWidget(parent)
     selectRect.setHeight(BOARD_CELL_HEIGHT);
     selectRect.setWidth(BOARD_CELL_WIDTH);
 
-    black_pawn_img.load(":img/IMG/black_pawn.png");
+
+    coordinate_t coord;
+
+    coord.x = 5;
+    coord.y = 6;
+
+
+    add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_PAWN);
 
 }
 
@@ -33,16 +40,7 @@ void ChessWidget::paintEvent(QPaintEvent *)
 
     draw_select_rect(selected_cell, painter);
 
-    QImage img1(":img/IMG/white_pawn.png");
-    painter.drawImage(27+BOARD_CELL_WIDTH*4,26+BOARD_CELL_WIDTH*3,img1);
-
-    quint32 img_x = 0;
-    quint32 img_y = 0;
-
-    TranslateBoardCoordToRectCoords(0, 0, img_x, img_y);
-
-    painter.drawImage(img_x+2,img_y+2,black_pawn_img);
-
+    draw_pieces(painter);
 }
 /* ************************************************************************************************************* */
 void ChessWidget::mousePressEvent(QMouseEvent *event)
@@ -109,9 +107,103 @@ bool ChessWidget::TranslateBoardCoordToRectCoords(quint8 board_x, quint8 board_y
 
     return true;
 }
+/* ************************************************************************************************************* */
+bool ChessWidget::add_piece_(coordinate_t& coordinate, piece_color_t color, piece_type_t type)
+{
+    if(coordinate.x > BOARD_LINE_CELL_CNT - 1 || coordinate.y > BOARD_LINE_CELL_CNT - 1)
+    {
+        return false;
+    }
 
+    piece_param_t piece(coordinate, color, type);
 
+    QString path;
 
+    switch(color)
+    {
+        case piece_color_t::PIECE_COLOR_BLACK:
+        {
+            path = ":black/IMG/black/";
+            break;
+        }
+
+        case piece_color_t::PIECE_COLOR_WHITE:
+        {
+            path = ":white/IMG/white/";
+            break;
+        }
+
+        default:
+        {
+            return false;
+        }
+    }
+
+    switch(type)
+    {
+        case piece_type_t::PIECE_TYPE_PAWN:
+        {
+            path +="pawn.png";
+            break;
+        }
+
+        case piece_type_t::PIECE_TYPE_KNIGHT:
+        {
+            path +="knight.png";
+            break;
+        }
+
+        case piece_type_t::PIECE_TYPE_BISHOP:
+        {
+            path +="bishop.png";
+            break;
+        }
+
+        case piece_type_t::PIECE_TYPE_ROOK:
+        {
+            break;
+        }
+
+        case piece_type_t::PIECE_TYPE_QUEEN:
+        {
+            path +="queen.png";
+            break;
+        }
+
+        case piece_type_t::PIECE_TYPE_KING:
+        {
+            path +="king.png";
+            break;
+        }
+
+        default:
+        {
+            return false;
+        }
+    }
+
+    piece.img.load(path);
+
+    pieces_vec.push_back(piece);
+
+    return true;
+}
+/* ************************************************************************************************************* */
+void ChessWidget::draw_pieces(QPainter& painter)
+{
+    for(int i = 0; i < pieces_vec.size(); ++i)
+    {
+        piece_param_t piece = pieces_vec.at(i);
+
+        quint32 img_x = 0;
+        quint32 img_y = 0;
+
+        TranslateBoardCoordToRectCoords(piece.coordinate.x, piece.coordinate.y, img_x, img_y);
+
+        painter.drawImage(img_x + 2, img_y + 2, piece.img);
+    }
+}
+/* ************************************************************************************************************* */
 
 
 
