@@ -9,7 +9,7 @@
 #define BOARD_CELL_WIDTH    63
 #define BOARD_X_COORD_START 26
 #define BOARD_Y_COORD_START 26
-#define BOARD_LINE_CELL_CNT 8
+
 
 
 ChessWidget::ChessWidget(QWidget *parent) : QWidget(parent)
@@ -21,6 +21,15 @@ ChessWidget::ChessWidget(QWidget *parent) : QWidget(parent)
     selectRect.setHeight(BOARD_CELL_HEIGHT);
     selectRect.setWidth(BOARD_CELL_WIDTH);
 
+    for(int i = 0; i < BOARD_LINE_CELL_CNT; ++i)
+    {
+        p_board_pieces_vec->resize(BOARD_LINE_CELL_CNT);
+
+        for(int j = 0; j < BOARD_LINE_CELL_CNT; ++j)
+        {
+            p_board_pieces_vec[i][j] = NULL;
+        }
+    }
 
     coordinate_t coord;
 

@@ -6,7 +6,8 @@
 #include <QRect>
 #include <QImage>
 #include <QVector>
-
+/* **************************************************** */
+#define BOARD_LINE_CELL_CNT 8
 /* **************************************************** */
 typedef struct coordinate_t
 {
@@ -88,6 +89,8 @@ private:
     bool    isCellSelected;
     coordinate_t selected_cell;         /* User selected cell */
     QVector<piece_param_t> pieces_vec;
+
+    QVector<QVector<piece_param_t*>> p_board_pieces_vec[BOARD_LINE_CELL_CNT];
 
 public:
     explicit ChessWidget(QWidget *parent = nullptr);
