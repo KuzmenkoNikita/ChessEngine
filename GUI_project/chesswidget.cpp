@@ -33,17 +33,15 @@ ChessWidget::ChessWidget(QWidget *parent) : QWidget(parent)
         board_pieces_vec.push_back(piece_param_vec);
     }
 
-    coordinate_t coord;
-
-    coord.x = 5;
-    coord.y = 6;
-
-
-    add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_PAWN);
-    add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_PAWN);
-
 }
-
+/* ************************************************************************************************************* */
+void ChessWidget::start_new_game()
+{
+    delete_all_pieces();
+    add_default_pieces();
+    repaint();
+}
+/* ************************************************************************************************************* */
 void ChessWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
@@ -173,6 +171,7 @@ bool ChessWidget::add_piece_(coordinate_t& coordinate, piece_color_t color, piec
 
         case piece_type_t::PIECE_TYPE_ROOK:
         {
+            path +="rook.png";
             break;
         }
 
@@ -219,6 +218,130 @@ void ChessWidget::draw_pieces(QPainter& painter)
         TranslateBoardCoordToRectCoords(piece.coordinate.x, piece.coordinate.y, img_x, img_y);
 
         painter.drawImage(img_x + 2, img_y + 2, piece.img);
+    }
+}
+/* ************************************************************************************************************* */
+bool ChessWidget::add_default_pieces()
+{
+    coordinate_t coord;
+
+    for(int i = 0; i < BOARD_LINE_CELL_CNT;++i)
+    {
+        coord.x = i;
+
+        coord.y = 1;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_WHITE, piece_type_t::PIECE_TYPE_PAWN))
+        {
+            return false;
+        }
+
+        coord.y = 6;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_PAWN))
+        {
+            return false;
+        }
+    }
+
+    for(int i = 0; i < 2; ++i)
+    {
+        coord.x = i * 7;
+        coord.y = 0;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_WHITE, piece_type_t::PIECE_TYPE_ROOK))
+        {
+            return false;
+        }
+
+        coord.y = 7;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_ROOK))
+        {
+            return false;
+        }
+    }
+
+    for(int i = 0; i < 2; ++i)
+    {
+        coord.x = 1 + i * 5;
+        coord.y = 0;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_WHITE, piece_type_t::PIECE_TYPE_KNIGHT))
+        {
+            return false;
+        }
+
+        coord.y = 7;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_KNIGHT))
+        {
+            return false;
+        }
+    }
+
+    for(int i = 0; i < 2; ++i)
+    {
+        coord.x = 2 + i * 3;
+        coord.y = 0;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_WHITE, piece_type_t::PIECE_TYPE_BISHOP))
+        {
+            return false;
+        }
+
+        coord.y = 7;
+
+        if(!add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_BISHOP))
+        {
+            return false;
+        }
+    }
+
+    coord.x = 3;
+    coord.y = 0;
+
+    if(!add_piece_(coord, piece_color_t::PIECE_COLOR_WHITE, piece_type_t::PIECE_TYPE_QUEEN))
+    {
+        return false;
+    }
+
+    coord.y = 7;
+
+    if(!add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_QUEEN))
+    {
+        return false;
+    }
+
+    coord.x = 4;
+    coord.y = 0;
+
+    if(!add_piece_(coord, piece_color_t::PIECE_COLOR_WHITE, piece_type_t::PIECE_TYPE_KING))
+    {
+        return false;
+    }
+
+    coord.y = 7;
+
+    if(!add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_KING))
+    {
+        return false;
+    }
+
+
+    return true;
+}
+/* ************************************************************************************************************* */
+void ChessWidget::delete_all_pieces()
+{
+    pieces_vec.resize(0);
+
+    for(int i = 0; i < BOARD_LINE_CELL_CNT;++i)
+    {
+        for(int j = 0; j < BOARD_LINE_CELL_CNT; ++j)
+        {
+            board_pieces_vec[i][j] = NULL;
+        }
     }
 }
 /* ************************************************************************************************************* */

@@ -94,6 +94,7 @@ private:
 
 public:
     explicit ChessWidget(QWidget *parent = nullptr);
+    void start_new_game();
 protected:
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);
@@ -103,6 +104,8 @@ private:
     bool TranslateBoardCoordToRectCoords(quint8 board_x, quint8 board_y, quint32& rect_x, quint32& rect_y);
     bool add_piece_(coordinate_t& coordinate, piece_color_t color, piece_type_t type);
     void draw_pieces(QPainter& painter);
+    bool add_default_pieces();
+    void delete_all_pieces();
 signals:
 
 };
