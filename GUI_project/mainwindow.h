@@ -17,7 +17,10 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+
+    void on_clean_board_button_clicked();
+
+    void on_new_game_button_clicked();
 
 private:
     Ui::MainWindow *ui;

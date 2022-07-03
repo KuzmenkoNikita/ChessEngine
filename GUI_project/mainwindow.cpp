@@ -20,8 +20,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_clean_board_button_clicked()
 {
-    wgt->start_new_game();
+    wgt->clean();
+}
+
+void MainWindow::on_new_game_button_clicked()
+{
+     wgt->start_new_game();
 }

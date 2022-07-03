@@ -95,6 +95,7 @@ private:
 public:
     explicit ChessWidget(QWidget *parent = nullptr);
     void start_new_game();
+    void clean();
 protected:
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);

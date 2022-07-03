@@ -26,7 +26,8 @@ public:
     QWidget *centralwidget;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
-    QPushButton *pushButton;
+    QPushButton *new_game_button;
+    QPushButton *clean_board_button;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -43,9 +44,12 @@ public:
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        pushButton = new QPushButton(centralwidget);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setGeometry(QRect(600, 20, 97, 33));
+        new_game_button = new QPushButton(centralwidget);
+        new_game_button->setObjectName(QString::fromUtf8("new_game_button"));
+        new_game_button->setGeometry(QRect(600, 20, 97, 33));
+        clean_board_button = new QPushButton(centralwidget);
+        clean_board_button->setObjectName(QString::fromUtf8("clean_board_button"));
+        clean_board_button->setGeometry(QRect(600, 70, 97, 33));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -63,7 +67,8 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        pushButton->setText(QCoreApplication::translate("MainWindow", "New game", nullptr));
+        new_game_button->setText(QCoreApplication::translate("MainWindow", "New game", nullptr));
+        clean_board_button->setText(QCoreApplication::translate("MainWindow", "Clean board", nullptr));
     } // retranslateUi
 
 };

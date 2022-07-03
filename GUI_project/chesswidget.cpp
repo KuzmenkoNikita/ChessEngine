@@ -42,6 +42,12 @@ void ChessWidget::start_new_game()
     repaint();
 }
 /* ************************************************************************************************************* */
+void ChessWidget::clean()
+{
+    delete_all_pieces();
+    repaint();
+}
+/* ************************************************************************************************************* */
 void ChessWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
