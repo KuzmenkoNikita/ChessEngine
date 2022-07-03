@@ -90,7 +90,7 @@ private:
     coordinate_t selected_cell;         /* User selected cell */
     QVector<piece_param_t> pieces_vec;
 
-    QVector<QVector<piece_param_t*>> p_board_pieces_vec[BOARD_LINE_CELL_CNT];
+    QVector<QVector<piece_param_t*>> board_pieces_vec;
 
 public:
     explicit ChessWidget(QWidget *parent = nullptr);

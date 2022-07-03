@@ -23,12 +23,14 @@ ChessWidget::ChessWidget(QWidget *parent) : QWidget(parent)
 
     for(int i = 0; i < BOARD_LINE_CELL_CNT; ++i)
     {
-        p_board_pieces_vec->resize(BOARD_LINE_CELL_CNT);
+        QVector<piece_param_t*> piece_param_vec;
 
         for(int j = 0; j < BOARD_LINE_CELL_CNT; ++j)
         {
-            p_board_pieces_vec[i][j] = NULL;
+            piece_param_vec.push_back(NULL);
         }
+
+        board_pieces_vec.push_back(piece_param_vec);
     }
 
     coordinate_t coord;
@@ -37,6 +39,7 @@ ChessWidget::ChessWidget(QWidget *parent) : QWidget(parent)
     coord.y = 6;
 
 
+    add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_PAWN);
     add_piece_(coord, piece_color_t::PIECE_COLOR_BLACK, piece_type_t::PIECE_TYPE_PAWN);
 
 }
@@ -191,9 +194,15 @@ bool ChessWidget::add_piece_(coordinate_t& coordinate, piece_color_t color, piec
         }
     }
 
+    if(board_pieces_vec[coordinate.x][coordinate.y] != NULL)
+    {
+        return false;
+    }
+
     piece.img.load(path);
 
     pieces_vec.push_back(piece);
+    board_pieces_vec[coordinate.x][coordinate.y] = &pieces_vec.last();
 
     return true;
 }
